@@ -25,7 +25,6 @@
 
   if (overlay) overlay.addEventListener('click', closeNav);
 
-  // Close nav when clicking a link
   document.querySelectorAll('.nav-links a').forEach(function (link) {
     link.addEventListener('click', closeNav);
   });
@@ -41,7 +40,7 @@
   /* --- Smooth scroll for anchor links --- */
   document.querySelectorAll('a[href^="#"]').forEach(function (a) {
     a.addEventListener('click', function (e) {
-      const target = document.querySelector(this.getAttribute('href'));
+      var target = document.querySelector(this.getAttribute('href'));
       if (target) {
         e.preventDefault();
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -52,9 +51,8 @@
   /* --- Accordion --- */
   document.querySelectorAll('.accordion-header').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      const item = this.parentElement;
-      const wasActive = item.classList.contains('active');
-      // close siblings
+      var item = this.parentElement;
+      var wasActive = item.classList.contains('active');
       item.parentElement.querySelectorAll('.accordion-item').forEach(function (sib) {
         sib.classList.remove('active');
       });
@@ -62,24 +60,63 @@
     });
   });
 
-  /* --- Simple scroll-reveal --- */
-  const reveals = document.querySelectorAll('.card, .product-card, .stat-item, .two-col-text, .two-col-img, .timeline-item');
+  /* --- Scroll Reveal --- */
+  var reveals = document.querySelectorAll('.card, .product-card, .stat-item, .two-col-text, .two-col-img, .timeline-item, .trust-badge, .stats-bar, .blog-card');
   if ('IntersectionObserver' in window && reveals.length) {
-    const observer = new IntersectionObserver(function (entries) {
+    var observer = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
+          entry.target.classList.add('revealed');
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
 
-    reveals.forEach(function (el) {
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(20px)';
-      el.style.transition = 'opacity .6s ease, transform .6s ease';
+    reveals.forEach(function (el, i) {
+      el.classList.add('reveal-ready');
+      el.style.transitionDelay = (i % 4) * 0.08 + 's';
       observer.observe(el);
+    });
+  }
+
+  /* --- Animated stat counters --- */
+  function animateCounter(el, target, suffix) {
+    var duration = 1800;
+    var startTime = null;
+
+    function step(timestamp) {
+      if (!startTime) startTime = timestamp;
+      var progress = Math.min((timestamp - startTime) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var current = Math.floor(eased * target);
+      el.textContent = current.toLocaleString() + suffix;
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  var statNumbers = document.querySelectorAll('.stat-number');
+  if ('IntersectionObserver' in window && statNumbers.length) {
+    var statObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          var el = entry.target;
+          var text = el.textContent.trim();
+          var match = text.match(/^([\d,]+)(.*)$/);
+          if (match) {
+            var num = parseInt(match[1].replace(/,/g, ''), 10);
+            var suffix = match[2] || '';
+            animateCounter(el, num, suffix);
+          }
+          statObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    statNumbers.forEach(function (el) {
+      statObserver.observe(el);
     });
   }
 })();
