@@ -1,6 +1,18 @@
 {
   "cleanUrls": true,
   "trailingSlash": true,
+  "redirects": [
+    { "source": "/product", "destination": "/dme/", "statusCode": 301 },
+    { "source": "/product/", "destination": "/dme/", "statusCode": 301 },
+    { "source": "/order-products", "destination": "/dme/", "statusCode": 301 },
+    { "source": "/order-products/", "destination": "/dme/", "statusCode": 301 },
+    { "source": "/location", "destination": "/contact/", "statusCode": 301 },
+    { "source": "/location/", "destination": "/contact/", "statusCode": 301 },
+    { "source": "/careers", "destination": "/about/", "statusCode": 301 },
+    { "source": "/careers/", "destination": "/about/", "statusCode": 301 },
+    { "source": "/login", "destination": "/", "statusCode": 301 },
+    { "source": "/login/", "destination": "/", "statusCode": 301 }
+  ],
   "headers": [
     {
       "source": "/(.*)",
